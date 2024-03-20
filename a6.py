@@ -65,6 +65,7 @@ class BayesClassifier:
         # enumerate function, which loops over something and has an automatic counter.
         # write something like this to track progress (note the `# type: ignore` comment
         # which tells mypy we know better and it shouldn't complain at us on this line):
+
         for index, filename in enumerate(files, 1): # type: ignore
             print(f"Training on file {index} of {len(files)}")
             text = self.load_file(os.path.join(self.training_data_directory, filename))
@@ -76,9 +77,9 @@ class BayesClassifier:
                 self.update_dict(tokens, self.neg_freqs)
             else:
                 print("Neutral Review Exception")
-        #     <the rest of your code for updating frequencies here>
-        self.save_dict(self.pos_freqs, self.training_data_directory)
-        self.save_dict(self.neg_freqs, self.training_data_directory)
+
+        self.save_dict(self.pos_freqs, self.pos_filename)
+        self.save_dict(self.neg_freqs, self.neg_filename)
 
         # we want to fill pos_freqs and neg_freqs with the correct counts of words from
         # their respective reviews
@@ -120,9 +121,36 @@ class BayesClassifier:
         Returns:
             classification, either positive, negative or neutral
         """
-        # TODO: fill me out
 
+        tokens: List[str] = self.tokenize(text)
+
+        positive_probability: float = 0
+        negative_probability: float = 0
+    
+        self.pos_freqs = self.load_dict(self.pos_filename)
+        self.neg_freqs = self.load_dict(self.neg_filename)
         
+        pos_sum = sum(self.pos_freqs.values())
+        neg_sum = sum(self.neg_freqs.values())
+
+        for token in tokens:
+            try:
+                pos_occurences = self.pos_freqs[token]
+            except KeyError:
+                pos_occurences = 0
+            
+            try:
+                neg_occurences = self.neg_freqs[token]
+            except KeyError:
+                neg_occurences = 0
+
+            positive_probability += math.log((pos_occurences + 1) / pos_sum)
+            negative_probability += math.log((neg_occurences + 1) / neg_sum)
+        
+        print("POSITIVE PROBABILITY: ", positive_probability)
+        print("NEGATIVE PROBABILITY: ", negative_probability)
+        return "positive" if positive_probability > negative_probability else "negative"
+    
         # get a list of the individual tokens that occur in text
         
 
@@ -232,8 +260,12 @@ class BayesClassifier:
             words - list of tokens to update frequencies of
             freqs - dictionary of frequencies to update
         """
-        # TODO: your work here
-        pass  # remove this line once you've implemented this method
+        
+        for word in words:
+            if freqs.get(word) is None:
+                freqs[word] = 1
+            else:
+                freqs[word] += 1
 
 
 if __name__ == "__main__":
@@ -249,8 +281,8 @@ if __name__ == "__main__":
     # assert a_dictionary["too"] == 1, "update_dict test 4"
     # print("update_dict tests passed.")
 
-    # pos_denominator = sum(b.pos_freqs.values())
-    # neg_denominator = sum(b.neg_freqs.values())
+    pos_denominator = sum(b.pos_freqs.values())
+    neg_denominator = sum(b.neg_freqs.values())
 
     # print("\nThese are the sums of values in the positive and negative dicitionaries.")
     # print(f"sum of positive word counts is: {pos_denominator}")
@@ -272,17 +304,17 @@ if __name__ == "__main__":
     # print(f"count for the word 'the' in positive dictionary {b.pos_freqs['the']}")
     # print(f"count for the word 'the' in negative dictionary {b.neg_freqs['the']}")
 
-    # print("\nHere are some sample probabilities.")
-    # print(f"P('love'| pos) {(b.pos_freqs['love']+1)/pos_denominator}")
-    # print(f"P('love'| neg) {(b.neg_freqs['love']+1)/neg_denominator}")
-    # print(f"P('terrible'| pos) {(b.pos_freqs['terrible']+1)/pos_denominator}")
-    # print(f"P('terrible'| neg) {(b.neg_freqs['terrible']+1)/neg_denominator}")
+    print("\nHere are some sample probabilities.")
+    print(f"P('love'| pos) {(b.pos_freqs['love']+1)/pos_denominator}")
+    print(f"P('love'| neg) {(b.neg_freqs['love']+1)/neg_denominator}")
+    print(f"P('terrible'| pos) {(b.pos_freqs['terrible']+1)/pos_denominator}")
+    print(f"P('terrible'| neg) {(b.neg_freqs['terrible']+1)/neg_denominator}")
 
-    # # uncomment the below lines once you've implemented `classify`
-    # print("\nThe following should all be positive.")
-    # print(b.classify('I love computer science'))
-    # print(b.classify('this movie is fantastic'))
-    # print("\nThe following should all be negative.")
-    # print(b.classify('rainy days are the worst'))
-    # print(b.classify('computer science is terrible'))
+    # uncomment the below lines once you've implemented `classify`
+    print("\nThe following should all be positive.")
+    print(b.classify('I love computer science'))
+    print(b.classify('this movie is fantastic'))
+    print("\nThe following should all be negative.")
+    print(b.classify('rainy days are the worst'))
+    print(b.classify('computer science is terrible'))
     pass
