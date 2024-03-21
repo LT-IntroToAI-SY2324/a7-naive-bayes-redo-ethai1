@@ -134,15 +134,8 @@ class BayesClassifier:
         neg_sum = sum(self.neg_freqs.values())
 
         for token in tokens:
-            try:
-                pos_occurences = self.pos_freqs[token]
-            except KeyError:
-                pos_occurences = 0
-            
-            try:
-                neg_occurences = self.neg_freqs[token]
-            except KeyError:
-                neg_occurences = 0
+            pos_occurences = self.pos_freqs.get(token, 0)
+            neg_occurences = self.neg_freqs.get(token, 0)
 
             positive_probability += math.log((pos_occurences + 1) / pos_sum)
             negative_probability += math.log((neg_occurences + 1) / neg_sum)
