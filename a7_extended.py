@@ -82,9 +82,6 @@ class BayesClassifier:
 
         positive_probability: float = 0
         negative_probability: float = 0
-    
-        self.pos_freqs = self.load_dict(self.pos_filename)
-        self.neg_freqs = self.load_dict(self.neg_filename)
         
         pos_sum = sum(self.pos_freqs.values())
         neg_sum = sum(self.neg_freqs.values())
@@ -98,6 +95,7 @@ class BayesClassifier:
         
         print("POSITIVE PROBABILITY: ", positive_probability)
         print("NEGATIVE PROBABILITY: ", negative_probability)
+
         return "positive" if positive_probability > negative_probability else "negative"
 
     def load_file(self, filepath: str) -> str:
@@ -168,7 +166,6 @@ class BayesClassifier:
     
     def get_stoplist(self):
         with open("sorted_stoplist.txt", "r") as stoplist:
-            # print(stoplist.read(), type(stoplist.read()))
             return stoplist.read()
 
     def update_dict(self, words: List[str], freqs: Dict[str, int]) -> None:
@@ -183,12 +180,9 @@ class BayesClassifier:
             words - list of tokens to update frequencies of
             freqs - dictionary of frequencies to update
         """
-        
-        
 
-
+        stoplist = self.get_stoplist()
         for word in words:
-            stoplist = self.get_stoplist()
             if word in stoplist: continue
             if freqs.get(word) is None:
                 freqs[word] = 1
@@ -199,38 +193,9 @@ class BayesClassifier:
 if __name__ == "__main__":
     b = BayesClassifier()
     b.get_stoplist()
-    # a_list_of_words = ["I", "really", "like", "this", "movie", ".", "I", "hope", \
-    #                    "you", "like", "it", "too"]
-    # a_dictionary = {}
-    # b.update_dict(a_list_of_words, a_dictionary)
-    # assert a_dictionary["I"] == 2, "update_dict test 1"
-    # assert a_dictionary["like"] == 2, "update_dict test 2"
-    # assert a_dictionary["really"] == 1, "update_dict test 3"
-    # assert a_dictionary["too"] == 1, "update_dict test 4"
-    # print("update_dict tests passed.")
 
     pos_denominator = sum(b.pos_freqs.values())
     neg_denominator = sum(b.neg_freqs.values())
-
-    # print("\nThese are the sums of values in the positive and negative dicitionaries.")
-    # print(f"sum of positive word counts is: {pos_denominator}")
-    # print(f"sum of negative word counts is: {neg_denominator}")
-
-    # print("\nHere are some sample word counts in the positive and negative dicitionaries.")
-    # print(f"count for the word 'love' in positive dictionary {b.pos_freqs['love']}")
-    # print(f"count for the word 'love' in negative dictionary {b.neg_freqs['love']}")
-    # print(f"count for the word 'terrible' in positive dictionary {b.pos_freqs['terrible']}")
-    # print(f"count for the word 'terrible' in negative dictionary {b.neg_freqs['terrible']}")
-    # print(f"count for the word 'computer' in positive dictionary {b.pos_freqs['computer']}")
-    # print(f"count for the word 'computer' in negative dictionary {b.neg_freqs['computer']}")
-    # print(f"count for the word 'science' in positive dictionary {b.pos_freqs['science']}")
-    # print(f"count for the word 'science' in negative dictionary {b.neg_freqs['science']}")
-    # print(f"count for the word 'i' in positive dictionary {b.pos_freqs['i']}")
-    # print(f"count for the word 'i' in negative dictionary {b.neg_freqs['i']}")
-    # print(f"count for the word 'is' in positive dictionary {b.pos_freqs['is']}")
-    # print(f"count for the word 'is' in negative dictionary {b.neg_freqs['is']}")
-    # print(f"count for the word 'the' in positive dictionary {b.pos_freqs['the']}")
-    # print(f"count for the word 'the' in negative dictionary {b.neg_freqs['the']}")
 
     print("\nHere are some sample probabilities.")
     print(f"P('love'| pos) {(b.pos_freqs['love']+1)/pos_denominator}")

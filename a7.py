@@ -126,9 +126,6 @@ class BayesClassifier:
 
         positive_probability: float = 0
         negative_probability: float = 0
-    
-        self.pos_freqs = self.load_dict(self.pos_filename)
-        self.neg_freqs = self.load_dict(self.neg_filename)
         
         pos_sum = sum(self.pos_freqs.values())
         neg_sum = sum(self.neg_freqs.values())
@@ -310,4 +307,7 @@ if __name__ == "__main__":
     print("\nThe following should all be negative.")
     print(b.classify('rainy days are the worst'))
     print(b.classify('computer science is terrible'))
-    pass
+
+    # print("---------------")
+    # print(b.classify('im conflicted, the action was awesome but the writing was mediocre'))
+    print("\nFINISHED. EXITING!")
