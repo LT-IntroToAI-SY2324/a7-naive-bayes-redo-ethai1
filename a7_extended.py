@@ -77,7 +77,6 @@ class BayesClassifier:
         Returns:
             classification, either positive, negative or neutral
         """
-
         tokens: List[str] = self.tokenize(text)
 
         positive_probability: float = 0
@@ -87,15 +86,23 @@ class BayesClassifier:
         neg_sum = sum(self.neg_freqs.values())
 
         for token in tokens:
-            pos_occurences = self.pos_freqs.get(token, 0)
-            neg_occurences = self.neg_freqs.get(token, 0)
+            pos_occurences = self.pos_freqs.get(token, 1)
+            neg_occurences = self.neg_freqs.get(token, 1)
 
-            positive_probability += math.log((pos_occurences + 1) / pos_sum)
-            negative_probability += math.log((neg_occurences + 1) / neg_sum)
+            positive_probability += math.log(pos_occurences / pos_sum)
+            negative_probability += math.log(neg_occurences / neg_sum)
+
+        # neglible difference
+        documents = len(self.pos_freqs) + len(self.neg_freqs)
+        positive_probability += positive_probability / documents
+        negative_probability += negative_probability / documents
         
         print("POSITIVE PROBABILITY: ", positive_probability)
         print("NEGATIVE PROBABILITY: ", negative_probability)
 
+        if abs(positive_probability - negative_probability) < 1:
+            return "neutral"
+        
         return "positive" if positive_probability > negative_probability else "negative"
 
     def load_file(self, filepath: str) -> str:

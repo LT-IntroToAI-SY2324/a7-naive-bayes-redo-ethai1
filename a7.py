@@ -131,11 +131,11 @@ class BayesClassifier:
         neg_sum = sum(self.neg_freqs.values())
 
         for token in tokens:
-            pos_occurences = self.pos_freqs.get(token, 0)
-            neg_occurences = self.neg_freqs.get(token, 0)
+            pos_occurences = self.pos_freqs.get(token, 1)
+            neg_occurences = self.neg_freqs.get(token, 1)
 
-            positive_probability += math.log((pos_occurences + 1) / pos_sum)
-            negative_probability += math.log((neg_occurences + 1) / neg_sum)
+            positive_probability += math.log(pos_occurences / pos_sum)
+            negative_probability += math.log(neg_occurences / neg_sum)
         
         print("POSITIVE PROBABILITY: ", positive_probability)
         print("NEGATIVE PROBABILITY: ", negative_probability)
@@ -252,10 +252,10 @@ class BayesClassifier:
         """
         
         for word in words:
-            if freqs.get(word) is None:
-                freqs[word] = 1
-            else:
+            if word in freqs:
                 freqs[word] += 1
+            else:
+                freqs[word] = 1
 
 
 if __name__ == "__main__":
@@ -275,8 +275,8 @@ if __name__ == "__main__":
     neg_denominator = sum(b.neg_freqs.values())
 
     # print("\nThese are the sums of values in the positive and negative dicitionaries.")
-    # print(f"sum of positive word counts is: {pos_denominator}")
-    # print(f"sum of negative word counts is: {neg_denominator}")
+    print(f"sum of positive word counts is: {pos_denominator}")
+    print(f"sum of negative word counts is: {neg_denominator}")
 
     # print("\nHere are some sample word counts in the positive and negative dicitionaries.")
     # print(f"count for the word 'love' in positive dictionary {b.pos_freqs['love']}")
